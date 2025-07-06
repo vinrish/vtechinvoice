@@ -15,5 +15,8 @@ export default defineConfigWithVueTs(
             '@typescript-eslint/no-explicit-any': 'off',
         },
     },
+    {
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+    },
     prettier,
 );
