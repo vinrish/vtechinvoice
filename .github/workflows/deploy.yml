@@ -1,0 +1,24 @@
+name: 🚀 Deploy to Shared Hosting via FTP
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  ftp-deploy:
+    name: 📂 FTP Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🚀 Deploy using FTP
+        uses: shivammathur/setup-php@v2
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./  # root of your repo
+          server-dir: /public_html/your-folder/  # change to your server's target path
