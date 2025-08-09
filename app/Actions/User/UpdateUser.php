@@ -14,7 +14,7 @@ final readonly class UpdateUser
      */
     public function handle(User $user, array $data): User
     {
-        DB::transaction(function () use ($user, $data) {
+        return DB::transaction(function () use ($user, $data) {
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],

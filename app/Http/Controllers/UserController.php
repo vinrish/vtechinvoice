@@ -6,10 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Actions\User\CreateUser;
 use App\Actions\User\DeleteUser;
+use App\Actions\User\UpdateUser;
+use App\Http\Requests\CreateUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,7 +21,11 @@ final class UserController extends Controller
      */
     public function index(): Response
     {
-        return Inertia::render('users/Index', []);
+        $users = User::query()->select('id', 'name', 'email', 'created_at')->latest()->paginate(20);
+
+        return Inertia::render('users/Index', [
+            'users' => $users,
+        ]);
     }
 
     /**
@@ -34,15 +39,9 @@ final class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, CreateUser $createUser): RedirectResponse
+    public function store(CreateUserRequest $request, CreateUser $createUser): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $createUser->handle($request->all());
+        $createUser->handle($request->validated());
 
         return to_route('users.index')->with('status', 'User created successfully.');
     }
@@ -50,9 +49,11 @@ final class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id): void
+    public function show(User $user): Response
     {
-        //
+        return Inertia::render('users/Show', [
+            'user' => $user->only('id', 'name', 'email', 'created_at'),
+        ]);
     }
 
     /**
@@ -66,9 +67,11 @@ final class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id): void
+    public function update(UpdateUserRequest $request, User $user, UpdateUser $updateUser): RedirectResponse
     {
-        //
+        $updateUser->handle($user, $request->validated());
+
+        return to_route('users.index')->with('status', 'User updated successfully.');
     }
 
     /**
